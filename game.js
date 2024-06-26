@@ -5,18 +5,28 @@ let gameLevel = 1;
 let userClickedPattern = [];
 let detectTap = false;
 
-// Detect tap and click events to start the game
-$(document).on('touchstart click', function(event) {
-  if (event.type === "touchstart") {
-    detectTap = true;
-  }
-  if (event.type === "click" || (event.type === "touchend" && detectTap)) {
+// Event listeners for touch events
+$(document).on('touchstart', function() {
+  detectTap = true; // Set detectTap on touchstart
+});
+$(document).on('touchmove', function() {
+  detectTap = false; // Reset detectTap on touchmove (to avoid scrolling issues)
+});
+$(document).on('touchend', function(event) {
+  if (detectTap) {
+    event.preventDefault(); // Prevent simulated mouse events
     startGame();
   }
 });
 
-$(document).keydown(function() {
-  startGame();
+// Event listener for keyboard input (keydown)
+$(document).on('keydown', function(event) {
+  if (!start) {
+    start = true;
+    headerOutput();
+    nextSequence();
+    clickColor();
+  }
 });
 
 function startGame() {
@@ -29,17 +39,17 @@ function startGame() {
 }
 
 function clickColor() {
-  $("#red").on("click touchend", randomChosenColour);
-  $("#blue").on("click touchend", randomChosenColour);
-  $("#green").on("click touchend", randomChosenColour);
-  $("#yellow").on("click touchend", randomChosenColour);
+  $("#red").on("click touchend", handleUserClick);
+  $("#blue").on("click touchend", handleUserClick);
+  $("#green").on("click touchend", handleUserClick);
+  $("#yellow").on("click touchend", handleUserClick);
 }
 
 function unclickColor() {
-  $("#red").off("click touchend", randomChosenColour);
-  $("#blue").off("click touchend", randomChosenColour);
-  $("#green").off("click touchend", randomChosenColour);
-  $("#yellow").off("click touchend", randomChosenColour);
+  $("#red").off("click touchend", handleUserClick);
+  $("#blue").off("click touchend", handleUserClick);
+  $("#green").off("click touchend", handleUserClick);
+  $("#yellow").off("click touchend", handleUserClick);
 }
 
 // Function to update the header of the game
@@ -58,9 +68,10 @@ function nextSequence() {
 }
 
 // Function to handle button click and user input
-function randomChosenColour(event) {
+function handleUserClick(event) {
   if (event.type === "touchend") {
     event.preventDefault(); // Prevent simulated mouse events on touch devices
+    detectTap = false; // Reset detectTap
   }
 
   let button = $(this);
