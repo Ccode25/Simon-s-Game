@@ -5,15 +5,12 @@ let gameLevel = 1;
 let userClickedPattern = [];
 let detectTap = false;
 
-$(document).on('touchstart', function() {
-  detectTap = true; // Detects all touch events
-});
-$(document).on('touchmove', function() {
-  detectTap = false; // Excludes the scroll events from touch events
-});
-$(document).on('click touchend', function(event) {
-  if (event.type === "click") detectTap = true; // Detects click events
-  if (detectTap) {
+// Detect tap and click events to start the game
+$(document).on('touchstart click', function(event) {
+  if (event.type === "touchstart") {
+    detectTap = true;
+  }
+  if (event.type === "click" || (event.type === "touchend" && detectTap)) {
     startGame();
   }
 });
@@ -32,17 +29,17 @@ function startGame() {
 }
 
 function clickColor() {
-  $("#red").on("click", randomChosenColour);
-  $("#blue").on("click", randomChosenColour);
-  $("#green").on("click", randomChosenColour);
-  $("#yellow").on("click", randomChosenColour);
+  $("#red").on("click touchend", randomChosenColour);
+  $("#blue").on("click touchend", randomChosenColour);
+  $("#green").on("click touchend", randomChosenColour);
+  $("#yellow").on("click touchend", randomChosenColour);
 }
 
 function unclickColor() {
-  $("#red").off("click", randomChosenColour);
-  $("#blue").off("click", randomChosenColour);
-  $("#green").off("click", randomChosenColour);
-  $("#yellow").off("click", randomChosenColour);
+  $("#red").off("click touchend", randomChosenColour);
+  $("#blue").off("click touchend", randomChosenColour);
+  $("#green").off("click touchend", randomChosenColour);
+  $("#yellow").off("click touchend", randomChosenColour);
 }
 
 // Function to update the header of the game
@@ -61,7 +58,11 @@ function nextSequence() {
 }
 
 // Function to handle button click and user input
-function randomChosenColour() {
+function randomChosenColour(event) {
+  if (event.type === "touchend") {
+    event.preventDefault(); // Prevent simulated mouse events on touch devices
+  }
+
   let button = $(this);
   let userChosenColour = button.attr("id");
   userClickedPattern.push(userChosenColour);
@@ -97,4 +98,13 @@ function fadeEffect(button) {
 }
 
 function playSound(name) {
-  let sound = new Audio("./sounds/"
+  let sound = new Audio("./sounds/" + name + ".mp3");
+  sound.play();
+}
+
+function startOver() {
+  gamePattern = [];
+  userClickedPattern = [];
+  gameLevel = 1;
+  start = false;
+}
