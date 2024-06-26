@@ -22,10 +22,7 @@ $(document).on('touchend', function(event) {
 // Event listener for keyboard input (keydown)
 $(document).on('keydown', function(event) {
   if (!start) {
-    start = true;
-    headerOutput();
-    nextSequence();
-    clickColor();
+    startGame();
   }
 });
 
